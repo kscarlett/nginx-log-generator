@@ -7,7 +7,7 @@ import (
 	"strings"
 	"time"
 
-	"github.com/brianvoe/gofakeit"
+	"github.com/brianvoe/gofakeit/v6"
 )
 
 func main() {
@@ -56,7 +56,7 @@ func weightedStatusCode(percentageOk int) int {
 		return 200
 	}
 
-	return gofakeit.SimpleStatusCode()
+	return gofakeit.HTTPStatusCodeSimple()
 }
 
 func weightedHTTPMethod(percentageGet, percentagePost int) string {
@@ -82,12 +82,12 @@ func randomPath(min, max int) string {
 
 	for i := 0; i < length; i++ {
 		if i > 0 {
-			path.WriteString(gofakeit.RandString([]string{"-", "-", "_", "%20", "/", "/", "/"}))
+			path.WriteString(gofakeit.RandomString([]string{"-", "-", "_", "%20", "/", "/", "/"}))
 		}
 		path.WriteString(gofakeit.BuzzWord())
 	}
 
-	path.WriteString(gofakeit.RandString([]string{".hmtl", ".php", ".htm", ".jpg", ".png", ".gif", ".svg", ".css", ".js"}))
+	path.WriteString(gofakeit.RandomString([]string{".hmtl", ".php", ".htm", ".jpg", ".png", ".gif", ".svg", ".css", ".js"}))
 
 	result := path.String()
 	return strings.Replace(result, " ", "%20", -1)

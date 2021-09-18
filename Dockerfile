@@ -35,8 +35,5 @@ COPY --from=builder /user/group /user/passwd /etc/
 # Run as the new non-root by default
 USER nobody:nobody
 
-# Set the default rate to once per second
-ENV RATE 1
-
 # Run the binary
 ENTRYPOINT [ "/app" ]

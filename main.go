@@ -13,7 +13,7 @@ import (
 type config struct {
 	Rate             float32 `env:"RATE" envDefault:"1"`
 	IPv4Percent      int     `env:"IPV4_PERCENT" envDefault:"100"`
-	SameIpAddresses  int     `env:"SAME_IP_ADDRESSES" envDefault: 0`
+	SameIpAddresses  int     `env:"SAME_IP_ADDRESSES" envDefault:"0"`
 	StatusOkPercent  int     `env:"STATUS_OK_PERCENT" envDefault:"80"`
 	PathMinLength    int     `env:"PATH_MIN" envDefault:"1"`
 	PathMaxLength    int     `env:"PATH_MAX" envDefault:"5"`

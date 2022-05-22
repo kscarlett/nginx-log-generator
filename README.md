@@ -24,17 +24,18 @@ $ docker run -e "RATE=10" kscarlett/nginx-log-generator
 
 The following environment variables can be set to modify the output.
 
-| Name              | Default | Notes                                                                                                                                           |
-| ----------------- | ------- | ----------------------------------------------------------------------------------------------------------------------------------------------- |
-| RATE              | 1       | Logs to output per second.                                                                                                                      |
-| IPV4_PERCENT      | 100     | Percentage of IP addresses that will be IPv4. Change to 0 to only get IPv6.                                                                     |
-| STATUS_OK_PERCENT | 80      | _Roughly_ the percentage of `200` status codes. The rest will be randomised and may contain `200` as well.                                      |
-| PATH_MIN          | 1       | Minimum elements to put in the request path.                                                                                                    |
-| PATH_MAX          | 5       | Maximum elements to put in the request path.                                                                                                    |
-| GET_PERCENT       | 60      | Percentage of requests that will be `GET` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods.    |
-| POST_PERCENT      | 30      | Percentage of requests that will be `POST` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods.   |
-| PUT_PERCENT       | 0       | Percentage of requests that will be `PUT` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods.    |
-| PATCH_PERCENT     | 0       | Percentage of requests that will be `PATCH` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods.  |
+| Name              | Default | Notes                                                        |
+| ----------------- | ------- | ------------------------------------------------------------ |
+| RATE              | 1       | Logs to output per second.                                   |
+| IPV4_PERCENT      | 100     | Percentage of IP addresses that will be IPv4. Change to 0 to only get IPv6. |
+| SAME_IP_ADDRESSES | 0       | The number of identical IP addresses. If the value is 0, random IP addresses will be used |
+| STATUS_OK_PERCENT | 80      | _Roughly_ the percentage of `200` status codes. The rest will be randomised and may contain `200` as well. |
+| PATH_MIN          | 1       | Minimum elements to put in the request path.                 |
+| PATH_MAX          | 5       | Maximum elements to put in the request path.                 |
+| GET_PERCENT       | 60      | Percentage of requests that will be `GET` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods. |
+| POST_PERCENT      | 30      | Percentage of requests that will be `POST` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods. |
+| PUT_PERCENT       | 0       | Percentage of requests that will be `PUT` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods. |
+| PATCH_PERCENT     | 0       | Percentage of requests that will be `PATCH` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods. |
 | DELETE_PERCENT    | 0       | Percentage of requests that will be `DELETE` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods. |
 
 ## Note

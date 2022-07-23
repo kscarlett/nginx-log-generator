@@ -2,7 +2,9 @@ package main
 
 import (
 	"fmt"
+	"log"
 	"math/rand"
+	"os"
 	"strings"
 	"time"
 
@@ -14,6 +16,8 @@ type config struct {
 	Rate             float32 `env:"RATE" envDefault:"1"`
 	IPv4Percent      int     `env:"IPV4_PERCENT" envDefault:"100"`
 	SameIpAddresses  int     `env:"SAME_IP_ADDRESSES" envDefault:"0"`
+	STDOUT           string  `env:"STDOUT" envDefault:"terminal"`
+	TruncateFile     int     `env:"TRUNCATE_FILE" envDefault:"0"`
 	StatusOkPercent  int     `env:"STATUS_OK_PERCENT" envDefault:"80"`
 	PathMinLength    int     `env:"PATH_MIN" envDefault:"1"`
 	PathMaxLength    int     `env:"PATH_MAX" envDefault:"5"`
@@ -49,6 +53,30 @@ func main() {
 		}
 	}
 
+	var (
+		fileFlags int
+		file      *os.File
+		err       error
+	)
+
+	if cfg.STDOUT != "terminal" {
+		fileFlags = os.O_WRONLY | os.O_CREATE
+		if cfg.TruncateFile == 1 {
+			fmt.Println("NGINX LOG GENERATOR [INFO]: open file with truncate")
+			fileFlags += os.O_TRUNC
+		} else {
+			fileFlags += os.O_APPEND
+		}
+
+		file, err = os.OpenFile(cfg.STDOUT, fileFlags, 0644)
+		if err != nil {
+			log.Fatal(err)
+		}
+		defer file.Close()
+
+		fmt.Printf("NGINX LOG GENERATOR [INFO]: started writing to %s\n", cfg.STDOUT)
+	}
+
 	for range ticker.C {
 		timeLocal = time.Now()
 
@@ -63,7 +91,12 @@ func main() {
 		bodyBytesSent = realisticBytesSent(statusCode)
 		userAgent = gofakeit.UserAgent()
 
-		fmt.Printf("%s - - [%s] \"%s %s %s\" %v %v \"%s\" \"%s\"\n", ip, timeLocal.Format("02/Jan/2006:15:04:05 -0700"), httpMethod, path, httpVersion, statusCode, bodyBytesSent, referrer, userAgent)
+		logLine := fmt.Sprintf("%s - - [%s] \"%s %s %s\" %v %v \"%s\" \"%s\"\n", ip, timeLocal.Format("02/Jan/2006:15:04:05 -0700"), httpMethod, path, httpVersion, statusCode, bodyBytesSent, referrer, userAgent)
+		if cfg.STDOUT == "terminal" {
+			fmt.Print(logLine)
+		} else {
+			file.WriteString(logLine)
+		}
 	}
 }
 

@@ -22,6 +22,18 @@ type config struct {
 	PercentageDelete int     `env:"DELETE_PERCENT" envDefault:"0"`
 }
 
+type schedule interface {
+	ticker() <-chan time.Time
+}
+
+type uniformSchedule struct {
+	rate time.Duration
+}
+
+func (s uniformSchedule) ticker() <-chan time.Time {
+	return time.NewTicker(time.Second / s.rate).C
+}
+
 func main() {
 	cfg := config{}
 	if err := env.Parse(&cfg); err != nil {
@@ -29,7 +41,7 @@ func main() {
 	}
 	checkMinMax(&cfg.PathMinLength, &cfg.PathMaxLength)
 
-	ticker := time.NewTicker(time.Second / time.Duration(cfg.Rate))
+	schedule := uniformSchedule{rate: time.Duration(cfg.Rate)}
 
 	gofakeit.Seed(time.Now().UnixNano())
 
@@ -40,7 +52,7 @@ func main() {
 	httpVersion = "HTTP/1.1"
 	referrer = "-"
 
-	for range ticker.C {
+	for range schedule.ticker() {
 		timeLocal = time.Now()
 
 		ip = weightedIPVersion(cfg.IPv4Percent)

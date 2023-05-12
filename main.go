@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -34,6 +35,24 @@ func (s uniformSchedule) ticker() <-chan time.Time {
 	return time.NewTicker(time.Second / s.rate).C
 }
 
+type fuzzySchedule struct {
+	rate time.Duration
+	fuzz time.Duration
+}
+
+func (s fuzzySchedule) ticker() <-chan time.Time {
+	channel := make(chan time.Time, 1)
+	go func() {
+		for {
+			var fuzzScale = (2.0*rand.Float64() - 1.0)
+			var delay = s.rate + time.Duration(fuzzScale*float64(s.fuzz))
+			time.Sleep(delay)
+			channel <- time.Now()
+		}
+	}()
+	return channel
+}
+
 func main() {
 	cfg := config{}
 	if err := env.Parse(&cfg); err != nil {
@@ -41,7 +60,7 @@ func main() {
 	}
 	checkMinMax(&cfg.PathMinLength, &cfg.PathMaxLength)
 
-	schedule := uniformSchedule{rate: time.Duration(cfg.Rate)}
+	schedule := fuzzySchedule{rate: time.Second * time.Duration(cfg.Rate), fuzz: time.Millisecond * time.Duration(900)}
 
 	gofakeit.Seed(time.Now().UnixNano())
 

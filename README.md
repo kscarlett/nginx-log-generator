@@ -36,6 +36,7 @@ The following environment variables can be set to modify the output.
 | PUT_PERCENT       | 0       | Percentage of requests that will be `PUT` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods.    |
 | PATCH_PERCENT     | 0       | Percentage of requests that will be `PATCH` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods.  |
 | DELETE_PERCENT    | 0       | Percentage of requests that will be `DELETE` requests. If the total adds up to less than 100%, the rest will be made up of random HTTP methods. |
+| FUZZ              | 0       | Determines the amount of random variation in the rate of log generation, in seconds. |
 
 ## Note
 

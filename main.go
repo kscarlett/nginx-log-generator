@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"math/rand"
 	"strings"
 	"time"
 
@@ -20,6 +21,38 @@ type config struct {
 	PercentagePut    int     `env:"PUT_PERCENT" envDefault:"0"`
 	PercentagePatch  int     `env:"PATCH_PERCENT" envDefault:"0"`
 	PercentageDelete int     `env:"DELETE_PERCENT" envDefault:"0"`
+	Fuzz             float32 `env:"FUZZ" envDefault:"0"`
+}
+
+type schedule interface {
+	ticker() <-chan time.Time
+}
+
+type uniformSchedule struct {
+	rate float32
+}
+
+func (s uniformSchedule) ticker() <-chan time.Time {
+	return time.NewTicker(time.Second / time.Duration(s.rate)).C
+}
+
+type fuzzySchedule struct {
+	rate float32
+	fuzz float32
+}
+
+func (s fuzzySchedule) ticker() <-chan time.Time {
+	channel := make(chan time.Time, 1)
+	var avgDelay = time.Second * time.Duration(s.rate)
+	go func() {
+		for {
+			var fuzzScale = (2.0*rand.Float32() - 1.0)
+			var delay = avgDelay + time.Duration(fuzzScale*s.fuzz*float32(time.Second))
+			time.Sleep(delay)
+			channel <- time.Now()
+		}
+	}()
+	return channel
 }
 
 func main() {
@@ -29,7 +62,12 @@ func main() {
 	}
 	checkMinMax(&cfg.PathMinLength, &cfg.PathMaxLength)
 
-	ticker := time.NewTicker(time.Second / time.Duration(cfg.Rate))
+	var schedule schedule
+	if cfg.Fuzz == 0.0 {
+		schedule = uniformSchedule{rate: cfg.Rate}
+	} else {
+		schedule = fuzzySchedule{rate: cfg.Rate, fuzz: cfg.Fuzz}
+	}
 
 	gofakeit.Seed(time.Now().UnixNano())
 
@@ -40,7 +78,7 @@ func main() {
 	httpVersion = "HTTP/1.1"
 	referrer = "-"
 
-	for range ticker.C {
+	for range schedule.ticker() {
 		timeLocal = time.Now()
 
 		ip = weightedIPVersion(cfg.IPv4Percent)
